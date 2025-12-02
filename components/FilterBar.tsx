@@ -1,0 +1,84 @@
+import React, { ChangeEvent } from 'react';
+import { Filters } from '../types';
+
+interface FilterBarProps {
+    filters: Filters;
+    onFilterChange: (filterName: keyof Filters, value: string | number) => void;
+}
+
+const FilterBar: React.FC<FilterBarProps> = ({ filters, onFilterChange }) => {
+
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        onFilterChange(name as keyof Filters, e.target.type === 'number' ? Number(value) : value);
+    };
+
+    return (
+        <div className="bg-white p-4 rounded-lg shadow-xl text-slate-700 w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
+                {/* Localização */}
+                <div className="flex flex-col md:col-span-2 lg:col-span-1">
+                    <label className="text-sm font-medium mb-1 text-left">Localização</label>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                         <input
+                            type="text"
+                            name="city"
+                            placeholder="Cidade"
+                            value={filters.city}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+                        />
+                         <input
+                            type="text"
+                            name="state"
+                            placeholder="Estado"
+                            value={filters.state}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+                        />
+                        <input
+                            type="text"
+                            name="neighborhood"
+                            placeholder="Bairro"
+                            value={filters.neighborhood}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+                        />
+                    </div>
+                </div>
+                
+                {/* Detalhes do Imóvel */}
+                <div className="flex flex-col md:col-span-2 lg:col-span-1">
+                     <label className="text-sm font-medium mb-1 text-left">Características</label>
+                     <div className="grid grid-cols-2 gap-2">
+                        <select name="propertyType" value={filters.propertyType} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+                            <option value="">Categoria</option>
+                            <option>Apartamento</option>
+                            <option>Casa</option>
+                            <option>Cobertura</option>
+                            <option>Terreno</option>
+                            <option>Comercial</option>
+                        </select>
+                         <select name="type" value={filters.type} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+                            <option value="todos">Venda/Aluguel</option>
+                            <option value="venda">Venda</option>
+                            <option value="aluguel">Aluguel</option>
+                        </select>
+                    </div>
+                </div>
+
+                {/* Botão de Busca */}
+                <div className="md:col-span-2 lg:col-span-1">
+                    <button 
+                        className="bg-sky-600 text-white font-bold py-2 px-4 rounded-md hover:bg-sky-700 transition-colors w-full"
+                        onClick={() => console.log('Filtrando...', filters)}
+                    >
+                        Buscar Imóveis
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default FilterBar;
