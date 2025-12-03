@@ -57,7 +57,8 @@ const ImageModal: React.FC<ImageModalProps> = ({ urls, startIndex, onClose }) =>
 
   return ReactDOM.createPortal(
     <div 
-      className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in-up"
+      style={{ animationDuration: '0.3s' }}
       onClick={onClose}
     >
       <div className="relative w-full h-full max-w-[90vw] max-h-[90vh]" onClick={e => e.stopPropagation()}>
@@ -67,39 +68,35 @@ const ImageModal: React.FC<ImageModalProps> = ({ urls, startIndex, onClose }) =>
           className="w-full h-full object-contain"
         />
 
-        {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-white hover:text-slate-300 transition-colors"
+          className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors z-10"
           aria-label="Fechar galeria"
         >
           <CloseIcon />
         </button>
 
-        {/* Left Arrow */}
         {urls.length > 1 && (
           <button
             onClick={goToPrevious}
-            className="absolute top-1/2 left-4 -translate-y-1/2 text-white p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition-colors"
+            className="absolute top-1/2 left-4 -translate-y-1/2 text-white/70 p-2 rounded-full hover:bg-white/10 hover:text-white transition-all"
             aria-label="Imagem anterior"
           >
             <ArrowLeftIcon />
           </button>
         )}
 
-        {/* Right Arrow */}
         {urls.length > 1 && (
           <button
             onClick={goToNext}
-            className="absolute top-1/2 right-4 -translate-y-1/2 text-white p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition-colors"
+            className="absolute top-1/2 right-4 -translate-y-1/2 text-white/70 p-2 rounded-full hover:bg-white/10 hover:text-white transition-all"
             aria-label="Próxima imagem"
           >
             <ArrowRightIcon />
           </button>
         )}
 
-        {/* Counter */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black bg-opacity-60 text-white text-sm px-3 py-1 rounded-full">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white text-sm px-3 py-1 rounded-full">
             {currentIndex + 1} / {urls.length}
         </div>
       </div>

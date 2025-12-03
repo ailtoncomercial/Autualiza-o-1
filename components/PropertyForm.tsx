@@ -1,15 +1,16 @@
+
 import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import { Property } from '../types';
 
 interface PropertyFormProps {
-  onAddProperty: (property: Omit<Property, 'id'>) => void;
+  onAddProperty: (property: Omit<Property, 'id' | 'userId'>) => void;
   editingProperty: Property | null;
   onUpdateProperty: (property: Property) => void;
   onCancelEdit: () => void;
 }
 
 const PhotoIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1} {...props}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1} {...props}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
     </svg>
 );
@@ -22,7 +23,6 @@ const CloseIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 
 
 const PropertyForm: React.FC<PropertyFormProps> = ({ onAddProperty, editingProperty, onUpdateProperty, onCancelEdit }) => {
-  // FIX: Added condoFee, iptu, and yearBuilt to Omit to prevent a type intersection issue (e.g., `string & number` becomes `never`).
   const initialState: Omit<Property, 'id' | 'photoUrls' | 'price' | 'bedrooms' | 'bathrooms' | 'garageSpots' | 'privateArea' | 'totalArea' | 'condoFee' | 'iptu' | 'yearBuilt'> & {
     price: string, bedrooms: string, bathrooms: string, garageSpots: string, privateArea: string, totalArea: string, condoFee: string, iptu: string, yearBuilt: string
   } = {
@@ -37,6 +37,8 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ onAddProperty, editingPrope
     condoFee: '',
     iptu: '',
     photo360Url: '',
+    videoEmbedCode: '',
+    showVideo: false,
     mapEmbedCode: '',
     description: '',
     type: 'venda',
@@ -84,6 +86,8 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ onAddProperty, editingPrope
         condoFee: editingProperty.condoFee?.toString() || '',
         iptu: editingProperty.iptu?.toString() || '',
         photo360Url: editingProperty.photo360Url || '',
+        videoEmbedCode: editingProperty.videoEmbedCode || '',
+        showVideo: editingProperty.showVideo,
         mapEmbedCode: editingProperty.mapEmbedCode || '',
         description: editingProperty.description,
         type: editingProperty.type,
@@ -162,20 +166,22 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ onAddProperty, editingPrope
       state: formState.state,
       neighborhood: formState.neighborhood,
       zipCode: formState.zipCode,
-      price: parseFloat(formState.price),
-      condoFee: formState.condoFee ? parseFloat(formState.condoFee) : undefined,
-      iptu: formState.iptu ? parseFloat(formState.iptu) : undefined,
+      price: Number(formState.price) || 0,
+      condoFee: formState.condoFee ? Number(formState.condoFee) : undefined,
+      iptu: formState.iptu ? Number(formState.iptu) : undefined,
       photo360Url: formState.photo360Url || undefined,
+      videoEmbedCode: formState.videoEmbedCode || undefined,
+      showVideo: formState.showVideo,
       mapEmbedCode: formState.mapEmbedCode || undefined,
       description: formState.description,
       type: formState.type,
       propertyType: formState.propertyType,
-      bedrooms: parseInt(formState.bedrooms, 10) || 0,
-      bathrooms: parseInt(formState.bathrooms, 10) || 0,
-      garageSpots: parseInt(formState.garageSpots, 10) || 0,
-      privateArea: parseInt(formState.privateArea, 10) || 0,
-      totalArea: parseInt(formState.totalArea, 10) || 0,
-      yearBuilt: formState.yearBuilt ? parseInt(formState.yearBuilt, 10) : undefined,
+      bedrooms: Number(formState.bedrooms) || 0,
+      bathrooms: Number(formState.bathrooms) || 0,
+      garageSpots: Number(formState.garageSpots) || 0,
+      privateArea: Number(formState.privateArea) || 0,
+      totalArea: Number(formState.totalArea) || 0,
+      yearBuilt: formState.yearBuilt ? Number(formState.yearBuilt) : undefined,
       status: formState.status,
       featured: formState.featured,
       photoUrls: photoPreviews,
@@ -198,8 +204,8 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ onAddProperty, editingPrope
   };
 
   const renderFieldset = (legend: string, children: React.ReactNode) => (
-    <fieldset className="border border-slate-300 p-4 rounded-md">
-        <legend className="text-sm font-medium text-slate-600 px-2">{legend}</legend>
+    <fieldset className="border border-slate-600 p-4 rounded-md">
+        <legend className="text-sm font-medium text-section-title px-2">{legend}</legend>
         <div className="space-y-4">
             {children}
         </div>
@@ -215,66 +221,68 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ onAddProperty, editingPrope
     isFurnished: 'Mobiliado',
   };
 
+  const inputStyles = "mt-1 block w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-sm shadow-sm placeholder-muted text-slate-800 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500";
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto">
-      <h2 className="text-2xl font-bold mb-5 text-center text-slate-700">
+    <div className="bg-slate-800 p-6 rounded-lg shadow-2xl shadow-black/30 max-h-[90vh] overflow-y-auto border border-slate-700">
+      <h2 className="text-2xl font-bold mb-5 text-center text-page-title">
         {editingProperty ? 'Editar Imóvel' : 'Cadastrar Novo Imóvel'}
       </h2>
-      {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
+      {error && <p className="text-red-400 text-sm mb-4 text-center">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-6">
         
         {renderFieldset('Informações Principais', <>
             <div>
-                 <label htmlFor="name" className="block text-sm font-medium text-slate-600">Nome do Imóvel</label>
-                <input type="text" name="name" id="name" value={formState.name} onChange={handleChange} placeholder="Ex: Casa com 3 quartos em..." className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                 <label htmlFor="name" className="block text-sm font-medium text-body">Nome do Imóvel</label>
+                <input type="text" name="name" id="name" value={formState.name} onChange={handleChange} placeholder="Ex: Casa com 3 quartos em..." className={`${inputStyles} text-slate-800`} />
             </div>
              <div>
-                 <label htmlFor="realtorName" className="block text-sm font-medium text-slate-600">Corretor Responsável (Opcional)</label>
-                <input type="text" name="realtorName" id="realtorName" value={formState.realtorName || ''} onChange={handleChange} placeholder="Nome do corretor" className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                 <label htmlFor="realtorName" className="block text-sm font-medium text-body">Corretor Responsável (Opcional)</label>
+                <input type="text" name="realtorName" id="realtorName" value={formState.realtorName || ''} onChange={handleChange} placeholder="Nome do corretor" className={`${inputStyles} text-slate-800`} />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                  <div>
-                    <label htmlFor="city" className="block text-sm font-medium text-slate-600">Cidade</label>
-                    <input type="text" name="city" id="city" value={formState.city} onChange={handleChange} placeholder="Ex: Curitiba" className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                    <label htmlFor="city" className="block text-sm font-medium text-body">Cidade</label>
+                    <input type="text" name="city" id="city" value={formState.city} onChange={handleChange} placeholder="Ex: Curitiba" className={`${inputStyles} text-slate-800`} />
                 </div>
                 <div>
-                    <label htmlFor="state" className="block text-sm font-medium text-slate-600">Estado</label>
-                    <input type="text" name="state" id="state" value={formState.state} onChange={handleChange} placeholder="Ex: PR" className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                    <label htmlFor="state" className="block text-sm font-medium text-body">Estado</label>
+                    <input type="text" name="state" id="state" value={formState.state} onChange={handleChange} placeholder="Ex: PR" className={`${inputStyles} text-slate-800`} />
                 </div>
                  <div>
-                    <label htmlFor="neighborhood" className="block text-sm font-medium text-slate-600">Bairro</label>
-                    <input type="text" name="neighborhood" id="neighborhood" value={formState.neighborhood} onChange={handleChange} placeholder="Ex: Centro" className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                    <label htmlFor="neighborhood" className="block text-sm font-medium text-body">Bairro</label>
+                    <input type="text" name="neighborhood" id="neighborhood" value={formState.neighborhood} onChange={handleChange} placeholder="Ex: Centro" className={`${inputStyles} text-slate-800`} />
                 </div>
             </div>
              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="sm:col-span-2">
-                    <label htmlFor="address" className="block text-sm font-medium text-slate-600">Endereço</label>
-                    <input type="text" name="address" id="address" value={formState.address} onChange={handleChange} placeholder="Rua, N°" className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                    <label htmlFor="address" className="block text-sm font-medium text-body">Endereço</label>
+                    <input type="text" name="address" id="address" value={formState.address} onChange={handleChange} placeholder="Rua, N°" className={`${inputStyles} text-slate-800`} />
                 </div>
                  <div>
-                    <label htmlFor="zipCode" className="block text-sm font-medium text-slate-600">CEP</label>
-                    <input type="text" name="zipCode" id="zipCode" value={formState.zipCode} onChange={handleChange} placeholder="00000-000" className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                    <label htmlFor="zipCode" className="block text-sm font-medium text-body">CEP</label>
+                    <input type="text" name="zipCode" id="zipCode" value={formState.zipCode} onChange={handleChange} placeholder="00000-000" className={`${inputStyles} text-slate-800`} />
                 </div>
             </div>
             <div>
-                 <label htmlFor="description" className="block text-sm font-medium text-slate-600">Descrição</label>
-                <textarea name="description" id="description" value={formState.description} onChange={handleChange} rows={4} placeholder="Descreva os detalhes do imóvel..." className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                 <label htmlFor="description" className="block text-sm font-medium text-body">Descrição</label>
+                <textarea name="description" id="description" value={formState.description} onChange={handleChange} rows={4} placeholder="Descreva os detalhes do imóvel..." className={`${inputStyles} text-slate-800`} />
             </div>
         </>)}
 
         {renderFieldset('Valores e Taxas (R$)', <>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                  <div>
-                    <label htmlFor="price" className="block text-sm font-medium text-slate-600">Valor do Imóvel</label>
-                    <input type="number" name="price" id="price" value={formState.price} onChange={handleChange} placeholder="Ex: 550000" className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                    <label htmlFor="price" className="block text-sm font-medium text-body">Valor do Imóvel</label>
+                    <input type="number" name="price" id="price" value={formState.price} onChange={handleChange} placeholder="Ex: 550000" className={`${inputStyles} text-slate-800`} />
                 </div>
                  <div>
-                    <label htmlFor="condoFee" className="block text-sm font-medium text-slate-600">Condomínio (Opcional)</label>
-                    <input type="number" name="condoFee" id="condoFee" value={formState.condoFee} onChange={handleChange} placeholder="Ex: 450" className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                    <label htmlFor="condoFee" className="block text-sm font-medium text-body">Condomínio (Opcional)</label>
+                    <input type="number" name="condoFee" id="condoFee" value={formState.condoFee} onChange={handleChange} placeholder="Ex: 450" className={`${inputStyles} text-slate-800`} />
                 </div>
                  <div>
-                    <label htmlFor="iptu" className="block text-sm font-medium text-slate-600">IPTU (Opcional)</label>
-                    <input type="number" name="iptu" id="iptu" value={formState.iptu} onChange={handleChange} placeholder="Ex: 1200" className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                    <label htmlFor="iptu" className="block text-sm font-medium text-body">IPTU (Opcional)</label>
+                    <input type="number" name="iptu" id="iptu" value={formState.iptu} onChange={handleChange} placeholder="Ex: 1200" className={`${inputStyles} text-slate-800`} />
                 </div>
             </div>
         </>)}
@@ -282,15 +290,15 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ onAddProperty, editingPrope
         {renderFieldset('Detalhes do Imóvel', <>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
-                    <label htmlFor="type" className="block text-sm font-medium text-slate-600">Tipo</label>
-                    <select name="type" id="type" value={formState.type} onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+                    <label htmlFor="type" className="block text-sm font-medium text-body">Tipo</label>
+                    <select name="type" id="type" value={formState.type} onChange={handleChange} className={`${inputStyles} text-slate-800`}>
                         <option value="venda">Venda</option>
                         <option value="aluguel">Aluguel</option>
                     </select>
                 </div>
                  <div>
-                    <label htmlFor="propertyType" className="block text-sm font-medium text-slate-600">Categoria</label>
-                    <select name="propertyType" id="propertyType" value={formState.propertyType} onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+                    <label htmlFor="propertyType" className="block text-sm font-medium text-body">Categoria</label>
+                    <select name="propertyType" id="propertyType" value={formState.propertyType} onChange={handleChange} className={`${inputStyles} text-slate-800`}>
                         <option>Apartamento</option>
                         <option>Casa</option>
                         <option>Cobertura</option>
@@ -299,40 +307,40 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ onAddProperty, editingPrope
                     </select>
                 </div>
                  <div>
-                    <label htmlFor="status" className="block text-sm font-medium text-slate-600">Situação</label>
-                    <select name="status" id="status" value={formState.status} onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+                    <label htmlFor="status" className="block text-sm font-medium text-body">Situação</label>
+                    <select name="status" id="status" value={formState.status} onChange={handleChange} className={`${inputStyles} text-slate-800`}>
                         <option>Usado</option>
                         <option>Novo</option>
                         <option>Lançamento</option>
                     </select>
                 </div>
                  <div>
-                    <label htmlFor="yearBuilt" className="block text-sm font-medium text-slate-600">Ano (Opcional)</label>
-                    <input type="number" name="yearBuilt" id="yearBuilt" value={formState.yearBuilt} onChange={handleChange} placeholder="Ex: 2018" className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                    <label htmlFor="yearBuilt" className="block text-sm font-medium text-body">Ano (Opcional)</label>
+                    <input type="number" name="yearBuilt" id="yearBuilt" value={formState.yearBuilt} onChange={handleChange} placeholder="Ex: 2018" className={`${inputStyles} text-slate-800`} />
                 </div>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
-                    <label htmlFor="bedrooms" className="block text-sm font-medium text-slate-600">Quartos</label>
-                    <input type="number" name="bedrooms" id="bedrooms" value={formState.bedrooms} onChange={handleChange} placeholder="Ex: 3" className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                    <label htmlFor="bedrooms" className="block text-sm font-medium text-body">Quartos</label>
+                    <input type="number" name="bedrooms" id="bedrooms" value={formState.bedrooms} onChange={handleChange} placeholder="Ex: 3" className={`${inputStyles} text-slate-800`} />
                 </div>
                  <div>
-                    <label htmlFor="bathrooms" className="block text-sm font-medium text-slate-600">Banheiros</label>
-                    <input type="number" name="bathrooms" id="bathrooms" value={formState.bathrooms} onChange={handleChange} placeholder="Ex: 2" className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                    <label htmlFor="bathrooms" className="block text-sm font-medium text-body">Banheiros</label>
+                    <input type="number" name="bathrooms" id="bathrooms" value={formState.bathrooms} onChange={handleChange} placeholder="Ex: 2" className={`${inputStyles} text-slate-800`} />
                 </div>
                  <div>
-                    <label htmlFor="garageSpots" className="block text-sm font-medium text-slate-600">Vagas</label>
-                    <input type="number" name="garageSpots" id="garageSpots" value={formState.garageSpots} onChange={handleChange} placeholder="Ex: 2" className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                    <label htmlFor="garageSpots" className="block text-sm font-medium text-body">Vagas</label>
+                    <input type="number" name="garageSpots" id="garageSpots" value={formState.garageSpots} onChange={handleChange} placeholder="Ex: 2" className={`${inputStyles} text-slate-800`} />
                 </div>
             </div>
              <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <label htmlFor="privateArea" className="block text-sm font-medium text-slate-600">Área Privativa (m²)</label>
-                    <input type="number" name="privateArea" id="privateArea" value={formState.privateArea} onChange={handleChange} placeholder="Ex: 120" className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                    <label htmlFor="privateArea" className="block text-sm font-medium text-body">Área Privativa (m²)</label>
+                    <input type="number" name="privateArea" id="privateArea" value={formState.privateArea} onChange={handleChange} placeholder="Ex: 120" className={`${inputStyles} text-slate-800`} />
                 </div>
                  <div>
-                    <label htmlFor="totalArea" className="block text-sm font-medium text-slate-600">Área Total (m²)</label>
-                    <input type="number" name="totalArea" id="totalArea" value={formState.totalArea} onChange={handleChange} placeholder="Ex: 200" className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                    <label htmlFor="totalArea" className="block text-sm font-medium text-body">Área Total (m²)</label>
+                    <input type="number" name="totalArea" id="totalArea" value={formState.totalArea} onChange={handleChange} placeholder="Ex: 200" className={`${inputStyles} text-slate-800`} />
                 </div>
             </div>
         </>)}
@@ -342,8 +350,8 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ onAddProperty, editingPrope
                 {Object.keys(featureTranslations)
                     .map(key => (
                         <label htmlFor={key} className="flex items-center" key={key}>
-                            <input type="checkbox" id={key} name={key} checked={formState[key as keyof typeof formState] as boolean} onChange={handleChange} className="h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500" />
-                            <span className="ml-2 text-sm text-slate-600">{featureTranslations[key]}</span>
+                            <input type="checkbox" id={key} name={key} checked={formState[key as keyof typeof formState] as boolean} onChange={handleChange} className="h-4 w-4 rounded border-slate-500 bg-slate-700 text-cyan-500 focus:ring-cyan-500" />
+                            <span className="ml-2 text-sm text-body">{featureTranslations[key]}</span>
                         </label>
                     ))
                 }
@@ -361,36 +369,46 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ onAddProperty, editingPrope
                 ))}
                 </div>
             )}
-            <div className="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-md">
+            <div className="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-600 border-dashed rounded-md">
                 <div className="space-y-1 text-center">
                 <PhotoIcon />
-                <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-sky-600 hover:text-sky-500">
+                <label htmlFor="file-upload" className="relative cursor-pointer bg-slate-800 rounded-md font-medium text-section-title hover:text-cyan-300">
                     <span>Adicionar fotos ({photoPreviews.length}/{MAX_PHOTOS})</span>
-                    <input id="file-upload" name="file-upload" type="file" className="sr-only" accept="image/*" multiple onChange={handlePhotoChange} disabled={photoPreviews.length >= MAX_PHOTOS}/>
+                    <input id="file-upload" name="file-upload" type="file" className="sr-only" accept="image/png, image/jpeg" multiple onChange={handlePhotoChange} disabled={photoPreviews.length >= MAX_PHOTOS}/>
                 </label>
-                <p className="text-xs text-slate-500">PNG, JPG até 10MB</p>
+                <p className="text-xs text-muted">PNG, JPG até 10MB</p>
                 </div>
             </div>
              <div>
-                 <label htmlFor="photo360Url" className="block text-sm font-medium text-slate-600">Link do Tour Virtual 360° (Opcional)</label>
-                <input type="url" name="photo360Url" id="photo360Url" value={formState.photo360Url || ''} onChange={handleChange} placeholder="Cole o link de compartilhamento do seu tour virtual" className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                 <label htmlFor="photo360Url" className="block text-sm font-medium text-body">Link do Tour Virtual 360° (Opcional)</label>
+                <input type="url" name="photo360Url" id="photo360Url" value={formState.photo360Url || ''} onChange={handleChange} placeholder="Cole o link de compartilhamento do seu tour virtual" className={`${inputStyles} text-slate-800`} />
             </div>
             <div>
-              <label htmlFor="mapEmbedCode" className="block text-sm font-medium text-slate-600">Código de Incorporação do Mapa (Opcional)</label>
-              <textarea name="mapEmbedCode" id="mapEmbedCode" value={formState.mapEmbedCode || ''} onChange={handleChange} rows={4} placeholder="Cole o código <iframe> do Google Maps aqui." className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                 <label htmlFor="videoEmbedCode" className="block text-sm font-medium text-body">Código de Incorporação de Vídeo do YouTube (Opcional)</label>
+                <textarea name="videoEmbedCode" id="videoEmbedCode" value={formState.videoEmbedCode || ''} onChange={handleChange} rows={3} placeholder="Cole o código <iframe> do vídeo do YouTube aqui." className={`${inputStyles} text-slate-800`} />
+            </div>
+            <div>
+                <label htmlFor="showVideo" className="flex items-center">
+                    <input type="checkbox" id="showVideo" name="showVideo" checked={formState.showVideo} onChange={handleChange} className="h-4 w-4 rounded border-slate-500 bg-slate-700 text-cyan-500 focus:ring-cyan-500" />
+                    <span className="ml-2 text-sm text-body">Exibir vídeo na página do imóvel</span>
+                </label>
+            </div>
+            <div>
+              <label htmlFor="mapEmbedCode" className="block text-sm font-medium text-body">Código de Incorporação do Mapa (Opcional)</label>
+              <textarea name="mapEmbedCode" id="mapEmbedCode" value={formState.mapEmbedCode || ''} onChange={handleChange} rows={4} placeholder="Cole o código <iframe> do Google Maps aqui." className={`${inputStyles} text-slate-800`} />
             </div>
         </>)}
 
         <div>
           <label htmlFor="featured" className="flex items-center">
-            <input type="checkbox" id="featured" name="featured" checked={formState.featured} onChange={handleChange} className="h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500" />
-            <span className="ml-2 text-sm text-slate-600">Destaque na Página Inicial</span>
+            <input type="checkbox" id="featured" name="featured" checked={formState.featured} onChange={handleChange} className="h-4 w-4 rounded border-slate-500 bg-slate-700 text-cyan-500 focus:ring-cyan-500" />
+            <span className="ml-2 text-sm text-body">Destaque na Página Inicial</span>
           </label>
         </div>
 
         <div className="flex flex-col space-y-2 pt-2">
-            <button type="submit" className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-sky-600 hover:bg-sky-700">{editingProperty ? 'Salvar Alterações' : 'Adicionar Imóvel'}</button>
-            <button type="button" onClick={onCancelEdit} className="w-full flex justify-center py-2 px-4 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">Cancelar</button>
+            <button type="submit" className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-lg text-sm font-medium btn-primary">{editingProperty ? 'Salvar Alterações' : 'Adicionar Imóvel'}</button>
+            <button type="button" onClick={onCancelEdit} className="w-full flex justify-center py-2 px-4 border border-slate-600 rounded-md shadow-sm text-sm font-medium text-body bg-slate-700/50 hover:bg-slate-700">Cancelar</button>
         </div>
       </form>
     </div>

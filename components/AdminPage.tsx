@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Property, User } from '../types';
 import PropertyForm from './PropertyForm';
@@ -51,7 +52,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ properties, currentUser, onAddPro
 
     const propertiesToDisplay = useMemo(() => {
         if (!currentUser) return [];
-        if (currentUser.role === 'Administrador') {
+        if (currentUser.role === 'Super Admin' || currentUser.role === 'Admin') {
             return properties;
         }
         return properties.filter(p => p.userId === currentUser.id);
@@ -81,47 +82,55 @@ const AdminPage: React.FC<AdminPageProps> = ({ properties, currentUser, onAddPro
         onDeleteProperty(propertyId);
     };
 
+    const canHighlight = (property: Property) => {
+        if (!currentUser) return false;
+        if (currentUser.role === 'Super Admin' || currentUser.role === 'Admin') return true;
+        return currentUser.role === 'Colaborador' && property.userId === currentUser.id;
+    };
+
     return (
         <>
-            <main className="container mx-auto p-4 lg:p-8">
+            <main className="container mx-auto p-4 lg:p-8 animate-fade-in-up">
                  <div className="flex justify-between items-center mb-8">
                     <button 
                         onClick={onGoBackToHome}
-                        className="flex items-center text-sm font-medium text-sky-600 hover:text-sky-800 transition-colors"
+                        className="flex items-center text-sm font-medium text-section-title hover:opacity-80 transition-colors"
                     >
                         <ArrowLeftIcon />
                         Voltar para a Home
                     </button>
-                    {currentUser?.role === 'Administrador' && (
-                        <div className="flex space-x-2">
-                            <button 
+                    <div className="flex space-x-2">
+                        {currentUser?.role === 'Super Admin' && (
+                             <button 
                                 onClick={onManageSite}
-                                className="px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-colors"
+                                className="px-4 py-2 border border-slate-600 text-sm font-medium rounded-md text-body bg-slate-700/50 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-cyan-500 transition-colors"
                             >
                                 Configurações do Site
                             </button>
+                        )}
+                        {(currentUser?.role === 'Super Admin' || currentUser?.role === 'Admin') && (
                             <button 
                                 onClick={onManageAdmins}
-                                className="px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-colors"
+                                className="px-4 py-2 border border-slate-600 text-sm font-medium rounded-md text-body bg-slate-700/50 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-cyan-500 transition-colors"
                             >
-                                Gerenciar Administradores
+                                Gerenciar Usuários
                             </button>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-3xl font-bold text-slate-800">Painel Administrativo</h1>
+                    <h1 className="text-3xl font-bold text-page-title">Painel Administrativo</h1>
                     <button
                         onClick={() => handleOpenModal()}
-                        className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-colors"
+                        className="px-5 py-2.5 text-sm font-medium rounded-md btn-primary"
                     >
                         Adicionar Novo Imóvel
                     </button>
                 </div>
 
-                <div className="bg-white rounded-lg shadow-md overflow-x-auto">
-                    <table className="w-full text-sm text-left text-slate-500">
-                        <thead className="text-xs text-slate-700 uppercase bg-slate-50">
+                <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-lg shadow-2xl shadow-black/20 overflow-x-auto">
+                    <table className="w-full text-sm text-left text-body">
+                        <thead className="text-xs text-muted uppercase bg-slate-700/50">
                             <tr>
                                 <th scope="col" className="px-6 py-3">Foto</th>
                                 <th scope="col" className="px-6 py-3">Imóvel</th>
@@ -134,7 +143,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ properties, currentUser, onAddPro
                         </thead>
                         <tbody>
                             {propertiesToDisplay.map(property => (
-                                <tr key={property.id} className="bg-white border-b hover:bg-slate-50">
+                                <tr key={property.id} className="border-b border-slate-700 hover:bg-slate-800/40">
                                     <td className="px-6 py-4">
                                         {property.photoUrls && property.photoUrls.length > 0 ? (
                                             <img
@@ -143,12 +152,12 @@ const AdminPage: React.FC<AdminPageProps> = ({ properties, currentUser, onAddPro
                                             className="w-16 h-10 object-cover rounded-md shadow-sm"
                                             />
                                         ) : (
-                                            <div className="w-16 h-10 bg-slate-200 rounded-md flex items-center justify-center text-xs text-slate-500">
+                                            <div className="w-16 h-10 bg-slate-700 rounded-md flex items-center justify-center text-xs text-muted">
                                             Sem foto
                                             </div>
                                         )}
                                     </td>
-                                    <th scope="row" className="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">
+                                    <th scope="row" className="px-6 py-4 font-medium text-page-title whitespace-nowrap">
                                         {property.name}
                                     </th>
                                     <td className="px-6 py-4">{property.realtorName || 'N/A'}</td>
@@ -159,22 +168,22 @@ const AdminPage: React.FC<AdminPageProps> = ({ properties, currentUser, onAddPro
                                         <div className="flex items-center justify-center space-x-2">
                                             <button 
                                                 onClick={() => onToggleFeatured(property.id)} 
-                                                className={`p-2 rounded-full transition-colors ${property.featured ? 'text-amber-500 hover:bg-amber-100' : 'text-slate-400 hover:bg-slate-100'}`}
-                                                title={property.featured ? "Remover do Destaque" : "Adicionar ao Destaque"}
-                                                disabled={currentUser?.role === 'Colaborador'}
+                                                disabled={!canHighlight(property)}
+                                                className={`p-2 rounded-full transition-colors ${property.featured ? 'text-amber-400 hover:bg-amber-400/10' : 'text-muted hover:bg-slate-700'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                                                title={canHighlight(property) ? (property.featured ? "Remover do Destaque" : "Adicionar ao Destaque") : "Sem permissão para destacar"}
                                             >
                                                 <StarIcon filled={property.featured} />
                                             </button>
                                             <button 
                                                 onClick={() => handleOpenModal(property)}
-                                                className="p-2 rounded-full text-slate-500 hover:bg-slate-100 hover:text-sky-600 transition-colors"
+                                                className="p-2 rounded-full text-muted hover:bg-slate-700 hover:text-section-title transition-colors"
                                                 title="Editar"
                                             >
                                                 <EditIcon />
                                             </button>
                                             <button 
                                                 onClick={() => confirmDelete(property.id)}
-                                                className="p-2 rounded-full text-slate-500 hover:bg-slate-100 hover:text-red-600 transition-colors"
+                                                className="p-2 rounded-full text-muted hover:bg-slate-700 hover:text-red-500 transition-colors"
                                                 title="Excluir"
                                             >
                                                 <DeleteIcon />
@@ -185,7 +194,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ properties, currentUser, onAddPro
                             ))}
                              {propertiesToDisplay.length === 0 && (
                                 <tr>
-                                    <td colSpan={7} className="text-center py-10 text-slate-500">
+                                    <td colSpan={7} className="text-center py-10 text-muted">
                                         Nenhum imóvel cadastrado por você. Clique em "Adicionar Novo Imóvel" para começar.
                                     </td>
                                 </tr>
@@ -196,11 +205,11 @@ const AdminPage: React.FC<AdminPageProps> = ({ properties, currentUser, onAddPro
             </main>
 
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
+                <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 flex items-center justify-center p-4 animate-fade-in-up" style={{animationDuration: '0.3s'}}>
                     <div className="relative z-50 w-full max-w-2xl">
                          <button 
                             onClick={handleCloseModal}
-                            className="absolute top-3 right-3 z-10 p-1 bg-white rounded-full text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-all"
+                            className="absolute -top-3 -right-3 z-10 p-1 bg-slate-700 rounded-full text-body hover:text-page-title hover:bg-slate-600 transition-all"
                             aria-label="Fechar"
                          >
                             <CloseIcon />

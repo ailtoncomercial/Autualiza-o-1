@@ -1,11 +1,8 @@
-
 import React from 'react';
 import Auth from './Login';
-import { User } from '../types';
 
 interface LoginPageProps {
   onLogin: (user: string, pass: string) => boolean;
-  onRegister: (newUser: Omit<User, 'id'>) => { success: boolean, message: string };
   onGoBackToHome: () => void;
 }
 
@@ -15,20 +12,20 @@ const ArrowLeftIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     </svg>
 );
 
-const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onRegister, onGoBackToHome }) => {
+const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onGoBackToHome }) => {
   return (
-    <main className="container mx-auto p-4 lg:p-8 flex justify-center items-start mt-4 sm:mt-8 md:mt-12">
+    <main className="container mx-auto p-4 lg:p-8 flex justify-center items-start mt-4 sm:mt-8 md:mt-12 animate-fade-in-up">
       <div className="w-full max-w-md">
         <div className="mb-6">
             <button 
                 onClick={onGoBackToHome}
-                className="flex items-center text-sm font-medium text-sky-600 hover:text-sky-800 transition-colors"
+                className="flex items-center text-sm font-medium text-section-title hover:opacity-80 transition-colors"
             >
                 <ArrowLeftIcon />
                 Voltar para a Home
             </button>
         </div>
-        <Auth onLogin={onLogin} onRegister={onRegister} />
+        <Auth onLogin={onLogin} />
       </div>
     </main>
   );

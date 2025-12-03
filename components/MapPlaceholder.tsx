@@ -14,7 +14,7 @@ const MapPlaceholder: React.FC<MapPlaceholderProps> = ({ address }) => {
 
   if (API_KEY === 'SUA_CHAVE_DE_API_AQUI') {
     return (
-      <div className="mt-4 p-4 rounded-lg bg-amber-100 border border-amber-300 text-amber-800 text-sm">
+      <div className="mt-4 p-4 rounded-lg bg-yellow-900/50 border border-yellow-700/50 text-yellow-300 text-sm">
         <p className="font-bold">Ação Necessária: Configurar a Chave de API</p>
         <p>Para exibir o mapa, insira sua chave de API do Google Maps no arquivo <code>components/MapPlaceholder.tsx</code>.</p>
       </div>
@@ -22,7 +22,7 @@ const MapPlaceholder: React.FC<MapPlaceholderProps> = ({ address }) => {
   }
 
   return (
-    <div className="mt-4 rounded-lg overflow-hidden border border-slate-200 shadow-inner">
+    <div className="mt-4 rounded-lg overflow-hidden border border-slate-700 shadow-inner">
       <iframe
         width="100%"
         height="200"

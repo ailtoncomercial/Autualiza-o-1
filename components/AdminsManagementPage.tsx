@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { User } from '../types';
 
@@ -6,11 +7,12 @@ interface AdminsManagementPageProps {
   currentUser: User | null;
   onGoBackToAdmin: () => void;
   onDeleteUser: (userId: string) => void;
-  onAddCollaboratorClick: () => void;
+  onAddUserClick: () => void;
+  onEditUser: (userId: string) => void;
 }
 
 const ArrowLeftIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} {...props}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} {...props}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
     </svg>
 );
@@ -21,74 +23,182 @@ const DeleteIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     </svg>
 );
 
+const EditIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} {...props}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+  </svg>
+);
 
-const AdminsManagementPage: React.FC<AdminsManagementPageProps> = ({ users, currentUser, onGoBackToAdmin, onDeleteUser, onAddCollaboratorClick }) => {
- 
+const AdminsManagementPage: React.FC<AdminsManagementPageProps> = ({ users, currentUser, onGoBackToAdmin, onDeleteUser, onAddUserClick, onEditUser }) => {
+  const admins = users.filter(u => u.role === 'Super Admin' || u.role === 'Admin');
+  const collaborators = users.filter(u => u.role === 'Colaborador');
+
+  const isSuperAdmin = currentUser?.role === 'Super Admin';
+  const isAdmin = currentUser?.role === 'Admin';
+
+  const checkCanDelete = (targetUser: User) => {
+      if (!currentUser) return false;
+      if (targetUser.role === 'Super Admin') return false; // Ninguém deleta Super Admin
+      if (isSuperAdmin) return true; // Super Admin deleta todos (exceto Super Admin acima)
+      if (isAdmin && targetUser.role === 'Colaborador') return true; // Admin deleta Colaborador
+      return false;
+  };
+
+  const checkCanEdit = (targetUser: User) => {
+      if (!currentUser) return false;
+      if (currentUser.id === targetUser.id) return true; // Edita a si mesmo
+      if (targetUser.role === 'Super Admin') return false; // Ninguém edita outro Super Admin
+      if (isSuperAdmin) return true; // Super Admin edita todos
+      if (isAdmin && (targetUser.role === 'Colaborador' || targetUser.role === 'Admin')) return true; // Admin edita Admins e Colabs
+      return false;
+  };
+
   return (
-    <main className="container mx-auto p-4 lg:p-8">
+    <main className="container mx-auto p-4 lg:p-8 animate-fade-in-up">
       <div className="mb-6">
         <button
           onClick={onGoBackToAdmin}
-          className="flex items-center text-sm font-medium text-sky-600 hover:text-sky-800 transition-colors"
+          className="flex items-center text-sm font-medium text-section-title hover:opacity-80 transition-colors"
         >
           <ArrowLeftIcon />
           Voltar para o Painel de Imóveis
         </button>
       </div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-slate-800">Gerenciar Usuários</h1>
+        <h1 className="text-3xl font-bold text-page-title">Gerenciar Usuários</h1>
         <button
-            onClick={onAddCollaboratorClick}
-            className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-colors"
+            onClick={onAddUserClick}
+            className="px-5 py-2.5 text-sm font-medium rounded-md btn-primary"
         >
-            Adicionar Novo Colaborador
+            Adicionar Novo Usuário
         </button>
       </div>
-      <div className="bg-white rounded-lg shadow-md overflow-x-auto">
-        <table className="w-full text-sm text-left text-slate-500">
-          <thead className="text-xs text-slate-700 uppercase bg-slate-50">
-            <tr>
-              <th scope="col" className="px-6 py-3">Nome Completo</th>
-              <th scope="col" className="px-6 py-3">Usuário (Login)</th>
-              <th scope="col" className="px-6 py-3">Cargo</th>
-              <th scope="col" className="px-6 py-3">Telefone</th>
-              <th scope="col" className="px-6 py-3 text-center">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map(user => (
-              <tr key={user.id} className="bg-white border-b hover:bg-slate-50">
-                <th scope="row" className="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">
-                  {user.fullName}
-                </th>
-                <td className="px-6 py-4">{user.username}</td>
-                <td className="px-6 py-4">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${user.role === 'Administrador' ? 'bg-sky-100 text-sky-800' : 'bg-slate-100 text-slate-800'}`}>
-                        {user.role}
-                    </span>
-                </td>
-                <td className="px-6 py-4">{user.phone}</td>
-                <td className="px-6 py-4 text-center">
-                   <button
-                    onClick={() => onDeleteUser(user.id)}
-                    disabled={user.role === 'Administrador'}
-                    className="p-2 rounded-full text-slate-500 hover:bg-slate-100 hover:text-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-500"
-                    title={user.role === 'Administrador' ? "Não é possível excluir o admin principal" : "Excluir colaborador"}
-                  >
-                    <DeleteIcon />
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {users.length === 0 && (
-              <tr>
-                <td colSpan={5} className="text-center py-10 text-slate-500">
-                  Nenhum usuário cadastrado.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      
+      <div className="space-y-8">
+        {/* TABELA DE ADMINISTRADORES */}
+        <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-lg shadow-2xl shadow-black/20 overflow-x-auto mb-8">
+            <h3 className="text-xl font-semibold text-page-title p-4">Administradores</h3>
+            <table className="w-full text-sm text-left text-body">
+            <thead className="text-xs text-muted uppercase bg-slate-700/50">
+                <tr>
+                <th scope="col" className="px-6 py-3">Nome Completo</th>
+                <th scope="col" className="px-6 py-3">Usuário (Login)</th>
+                <th scope="col" className="px-6 py-3">Cargo</th>
+                <th scope="col" className="px-6 py-3">Telefone</th>
+                <th scope="col" className="px-6 py-3 text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {admins.map(user => (
+                <tr key={user.id} className="border-b border-slate-700 hover:bg-slate-800/40">
+                    <th scope="row" className="px-6 py-4 font-medium text-page-title whitespace-nowrap">
+                    {user.fullName}
+                    </th>
+                    <td className="px-6 py-4">{user.username}</td>
+                    <td className="px-6 py-4">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            user.role === 'Super Admin' ? 'bg-cyan-900/50 text-cyan-300' 
+                            : 'bg-indigo-900/50 text-indigo-300'}`
+                        }>
+                            {user.role}
+                        </span>
+                    </td>
+                    <td className="px-6 py-4">{user.phone}</td>
+                    <td className="px-6 py-4 text-center">
+                    <div className="flex items-center justify-center space-x-2">
+                        <button
+                            type="button"
+                            onClick={() => onEditUser(user.id)}
+                            disabled={!checkCanEdit(user)}
+                            className="p-2 rounded-full text-muted hover:bg-slate-700 hover:text-section-title transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            title={!checkCanEdit(user) ? "Sem permissão" : "Editar"}
+                        >
+                            <EditIcon />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); onDeleteUser(user.id); }}
+                            disabled={!checkCanDelete(user)}
+                            className="p-2 rounded-full text-muted hover:bg-slate-700 hover:text-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            title={!checkCanDelete(user) ? "Sem permissão" : "Excluir"}
+                        >
+                            <DeleteIcon />
+                        </button>
+                    </div>
+                    </td>
+                </tr>
+                ))}
+                {admins.length === 0 && (
+                <tr>
+                    <td colSpan={5} className="text-center py-10 text-muted">
+                    Nenhum administrador encontrado.
+                    </td>
+                </tr>
+                )}
+            </tbody>
+            </table>
+        </div>
+
+        {/* TABELA DE COLABORADORES */}
+        <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-lg shadow-2xl shadow-black/20 overflow-x-auto mb-8">
+            <h3 className="text-xl font-semibold text-page-title p-4">Colaboradores</h3>
+            <table className="w-full text-sm text-left text-body">
+            <thead className="text-xs text-muted uppercase bg-slate-700/50">
+                <tr>
+                <th scope="col" className="px-6 py-3">Nome Completo</th>
+                <th scope="col" className="px-6 py-3">Usuário (Login)</th>
+                <th scope="col" className="px-6 py-3">Cargo</th>
+                <th scope="col" className="px-6 py-3">Telefone</th>
+                <th scope="col" className="px-6 py-3 text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {collaborators.map(user => (
+                <tr key={user.id} className="border-b border-slate-700 hover:bg-slate-800/40">
+                    <th scope="row" className="px-6 py-4 font-medium text-page-title whitespace-nowrap">
+                    {user.fullName}
+                    </th>
+                    <td className="px-6 py-4">{user.username}</td>
+                    <td className="px-6 py-4">
+                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-slate-700 text-body">
+                            {user.role}
+                        </span>
+                    </td>
+                    <td className="px-6 py-4">{user.phone}</td>
+                    <td className="px-6 py-4 text-center">
+                    <div className="flex items-center justify-center space-x-2">
+                        <button
+                            type="button"
+                            onClick={() => onEditUser(user.id)}
+                            disabled={!checkCanEdit(user)}
+                            className="p-2 rounded-full text-muted hover:bg-slate-700 hover:text-section-title transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            title={!checkCanEdit(user) ? "Sem permissão" : "Editar"}
+                        >
+                            <EditIcon />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); onDeleteUser(user.id); }}
+                            disabled={!checkCanDelete(user)}
+                            className="p-2 rounded-full text-muted hover:bg-slate-700 hover:text-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            title={!checkCanDelete(user) ? "Sem permissão" : "Excluir"}
+                        >
+                            <DeleteIcon />
+                        </button>
+                    </div>
+                    </td>
+                </tr>
+                ))}
+                {collaborators.length === 0 && (
+                <tr>
+                    <td colSpan={5} className="text-center py-10 text-muted">
+                    Nenhum colaborador encontrado.
+                    </td>
+                </tr>
+                )}
+            </tbody>
+            </table>
+        </div>
       </div>
     </main>
   );

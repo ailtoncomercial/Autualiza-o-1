@@ -16,52 +16,54 @@ const AboutPage: React.FC<AboutPageProps> = ({ onGoBackToHome, settings }) => {
   const values = settings.aboutPageValues.split('\n').filter(line => line.trim() !== '');
 
   return (
-    <main className="container mx-auto p-4 lg:p-8">
+    <main className="container mx-auto p-4 lg:p-8 animate-fade-in-up">
       <div className="mb-6">
         <button 
             onClick={onGoBackToHome}
-            className="flex items-center text-sm font-medium text-sky-600 hover:text-sky-800 transition-colors"
+            className="flex items-center text-sm font-medium text-section-title hover:opacity-80 transition-colors"
         >
             <ArrowLeftIcon />
             Voltar para a Home
         </button>
       </div>
       
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8 md:p-12">
-        <h1 className="text-4xl font-bold text-slate-800 text-center mb-8">Quem Somos</h1>
+      <div className="max-w-4xl mx-auto bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-lg shadow-2xl shadow-black/20 p-8 md:p-12">
+        <h1 className="text-4xl font-bold text-page-title text-center mb-8">Quem Somos</h1>
         
-        <div className="mb-10">
-            <img 
-                src={settings.aboutPageImageUrl} 
-                alt="Escritório da imobiliária DIGIFOX"
-                className="w-full h-64 object-cover rounded-lg shadow-md"
-            />
-        </div>
+        {settings.aboutPageImageUrl && (
+          <div className="mb-10 rounded-lg overflow-hidden shadow-lg">
+              <img 
+                  src={settings.aboutPageImageUrl} 
+                  alt="Escritório da imobiliária DIGIFOX"
+                  className="w-full h-64 object-cover"
+              />
+          </div>
+        )}
 
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold text-sky-700 mb-4 border-b pb-2">Nossa História</h2>
-          <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
+          <h2 className="text-2xl font-semibold text-section-title mb-4 border-b border-slate-700 pb-2">Nossa História</h2>
+          <p className="text-body leading-relaxed whitespace-pre-wrap">
             {settings.aboutPageHistory}
           </p>
         </section>
         
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold text-sky-700 mb-4 border-b pb-2">Nossa Missão</h2>
-          <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
+          <h2 className="text-2xl font-semibold text-section-title mb-4 border-b border-slate-700 pb-2">Nossa Missão</h2>
+          <p className="text-body leading-relaxed whitespace-pre-wrap">
             {settings.aboutPageMission}
           </p>
         </section>
         
         <section>
-          <h2 className="text-2xl font-semibold text-sky-700 mb-4 border-b pb-2">Nossos Valores</h2>
-          <ul className="list-disc list-inside text-slate-600 space-y-2">
+          <h2 className="text-2xl font-semibold text-section-title mb-4 border-b border-slate-700 pb-2">Nossos Valores</h2>
+          <ul className="list-disc list-inside text-body space-y-2">
             {values.map((value, index) => {
                 const parts = value.split(':');
                 const strongText = parts[0];
                 const normalText = parts.slice(1).join(':');
                 return (
                      <li key={index}>
-                        {strongText && <strong>{strongText}:</strong>}
+                        {strongText && <strong className="text-page-title">{strongText}:</strong>}
                         {normalText}
                     </li>
                 )

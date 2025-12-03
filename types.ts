@@ -1,3 +1,4 @@
+
 export interface Property {
   id: string;
   userId?: string; // ID do usuário que cadastrou o imóvel
@@ -32,7 +33,11 @@ export interface Property {
   hasBalcony: boolean;
   hasYard: boolean;
   isFurnished: boolean;
-  mapEmbedCode?: string; // Novo
+  mapEmbedCode?: string; 
+  
+  // Vídeo
+  videoEmbedCode?: string; // Novo: Código de incorporação do YouTube
+  showVideo: boolean; // Novo: Opção para exibir ou não
 }
 
 export interface User {
@@ -41,7 +46,7 @@ export interface User {
   phone: string;
   username: string;
   password: string; // Em um aplicativo real, isso deve ser um hash
-  role: 'Administrador' | 'Colaborador';
+  role: 'Super Admin' | 'Admin' | 'Colaborador';
 }
 
 export interface Filters {
@@ -56,23 +61,48 @@ export interface Filters {
   priceMax: number;
 }
 
+export interface HeroBanner {
+  imageUrl: string;
+  title: string;
+  subtitle: string;
+  titleColor: string;
+  subtitleColor: string;
+  fontFamily: string;
+}
+
 export interface SiteSettings {
   logoUrl: string;
-  heroImageUrl: string;
+  logoText: string;
+  showLogoText: boolean;
+  heroBanners: HeroBanner[];
   footerContactEmail: string;
   footerContactPhone: string;
+  footerDescription: string; // Novo
+  footerCopyright: string;   // Novo
+
   footerFacebookUrl: string;
   footerInstagramUrl: string;
   footerLinkedInUrl: string;
-  headerBackgroundColor: string;
-  footerBackgroundColor: string;
   aboutPageImageUrl: string;
   aboutPageHistory: string;
   aboutPageMission: string;
   aboutPageValues: string;
   contactFormRecipientEmail: string;
   companyAddress: string;
-  mapEmbedCode: string; // Novo
+  mapEmbedCode: string;
+
+  // Novas Configurações de Cor e Fundo
+  backgroundColor: string;
+  backgroundImageUrl: string;
+  pageTitleColor: string;
+  sectionTitleColor: string;
+  bodyTextColor: string;
+  bodyTextMutedColor: string;
+  headerBackgroundColor: string;
+  headerMenuColor: string;
+  headerMenuHighlightColor: string;
+  buttonColor: string;
+  footerBackgroundColor: string;
 }
 
-export type Page = 'home' | 'login' | 'detail' | 'admin' | 'admins' | 'addCollaborator' | 'settings' | 'about' | 'contact' | 'location'; // Novo
+export type Page = 'home' | 'login' | 'detail' | 'admin' | 'admins' | 'addUser' | 'editUser' | 'settings' | 'about' | 'contact' | 'location' | 'searchResults';

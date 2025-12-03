@@ -50,50 +50,51 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onViewProperty })
   return (
     <div 
         id={`property-${property.id}`} 
-        className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col transform hover:-translate-y-1 transition-transform duration-300 group"
+        className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-lg overflow-hidden flex flex-col transition-all duration-300 group hover:border-section-title/50 hover:shadow-2xl hover:shadow-cyan-500/10 hover:-translate-y-2"
     >
-        <div className="relative">
+        <div className="relative overflow-hidden">
             <div className="h-56">
-                <ImageSlider urls={property.photoUrls} />
+                <div className="w-full h-full transition-transform duration-500 group-hover:scale-110">
+                    <ImageSlider urls={property.photoUrls} />
+                </div>
             </div>
-            <div className={`absolute top-2 left-2 px-2.5 py-1 text-xs font-semibold text-white rounded-full ${property.type === 'venda' ? 'bg-sky-600' : 'bg-green-600'}`}>
+            <div className={`absolute top-3 left-3 px-3 py-1 text-xs font-semibold text-white rounded-full backdrop-blur-sm ${property.type === 'venda' ? 'bg-section-title/50' : 'bg-green-600/50'}`}>
                 {property.type === 'venda' ? 'Venda' : 'Aluguel'}
             </div>
         </div>
       
-      <div className="p-4 flex-grow flex flex-col">
-        <p className="text-sm font-semibold text-sky-700">{property.propertyType}</p>
-        <h3 className="text-lg font-bold text-slate-800 truncate mt-1">{property.name}</h3>
-        <p className="text-sm text-slate-500 mt-1 truncate">{property.neighborhood}, {property.city} - {property.state}</p>
+      <div className="p-5 flex-grow flex flex-col">
+        <p className="text-sm font-semibold text-section-title">{property.propertyType}</p>
+        <h3 className="text-lg font-bold text-page-title truncate mt-1">{property.name}</h3>
+        <p className="text-sm text-muted mt-1 truncate">{property.neighborhood}, {property.city} - {property.state}</p>
 
-        <div className="my-4 py-3 border-t border-b border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm text-slate-600">
+        <div className="my-4 py-3 border-t border-b border-slate-700 grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm text-body">
             <div className="flex items-center space-x-2">
-                <BedIcon className="w-5 h-5 text-slate-400" />
+                <BedIcon className="w-5 h-5 text-section-title/70" />
                 <span>{property.bedrooms} {property.bedrooms > 1 ? 'Quartos' : 'Quarto'}</span>
             </div>
              <div className="flex items-center space-x-2">
-                <BathIcon className="w-5 h-5 text-slate-400" />
+                <BathIcon className="w-5 h-5 text-section-title/70" />
                 <span>{property.bathrooms} {property.bathrooms > 1 ? 'Banh.' : 'Banh.'}</span>
             </div>
              <div className="flex items-center space-x-2">
-                <AreaIcon className="w-5 h-5 text-slate-400" />
-                {/* FIX: Use `privateArea` instead of `area` which does not exist on the Property type. */}
+                <AreaIcon className="w-5 h-5 text-section-title/70" />
                 <span>{property.privateArea} m²</span>
             </div>
              <div className="flex items-center space-x-2">
-                <GarageIcon className="w-5 h-5 text-slate-400" />
+                <GarageIcon className="w-5 h-5 text-section-title/70" />
                 <span>{property.garageSpots} {property.garageSpots > 1 ? 'Vagas' : 'Vaga'}</span>
             </div>
         </div>
         
-        <div className="mt-auto flex items-center justify-between">
+        <div className="mt-auto flex items-end justify-between">
             <div>
-                <p className="text-xs text-slate-500">Valor</p>
-                <p className="text-xl font-bold text-slate-800">{formattedPrice}</p>
+                <p className="text-xs text-muted">Valor</p>
+                <p className="text-xl font-bold text-page-title">{formattedPrice}</p>
             </div>
             <button
                 onClick={() => onViewProperty(property.id)}
-                className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-colors"
+                className="px-5 py-2.5 text-sm font-medium rounded-md btn-primary"
                 aria-label={`Ver mais detalhes sobre ${property.name}`}
             >
                 Veja Mais
