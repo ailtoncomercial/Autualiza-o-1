@@ -1,8 +1,9 @@
+
 import React, { useState, FormEvent, useEffect } from 'react';
 import { User } from '../types';
 
 interface AddUserPageProps {
-  onAddUser?: (newUser: Omit<User, 'id'>) => { success: boolean, message: string };
+  onAddUser?: (newUser: Omit<User, 'id'>) => Promise<{ success: boolean, message: string }>;
   onUpdateUser?: (updatedUser: User) => void;
   onCancel: () => void;
   currentUser: User | null;
@@ -23,6 +24,7 @@ const AddUserPage: React.FC<AddUserPageProps> = ({ onAddUser, onUpdateUser, onCa
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState<'Admin' | 'Colaborador'>('Colaborador');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const isEditMode = !!userToEdit;
 
@@ -38,13 +40,15 @@ const AddUserPage: React.FC<AddUserPageProps> = ({ onAddUser, onUpdateUser, onCa
   
   const inputStyles = "mt-1 block w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-sm shadow-sm placeholder-muted text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 disabled:opacity-50";
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsSubmitting(true);
 
     if (isEditMode) {
         if (!fullName || !phone || !role) {
             setError('Por favor, preencha nome, telefone e cargo.');
+            setIsSubmitting(false);
             return;
         }
         if (onUpdateUser && userToEdit) {
@@ -55,20 +59,26 @@ const AddUserPage: React.FC<AddUserPageProps> = ({ onAddUser, onUpdateUser, onCa
                 role,
                 password: newPassword ? newPassword : userToEdit.password
             };
-            onUpdateUser(updatedUser);
+            await onUpdateUser(updatedUser);
         }
     } else {
         if (!fullName || !phone || !username || !password || !role) {
             setError('Por favor, preencha todos os campos.');
+            setIsSubmitting(false);
             return;
         }
         if (onAddUser) {
-            const result = onAddUser({ fullName, phone, username, password, role });
-            if (!result.success) {
-                setError(result.message);
+            try {
+                const result = await onAddUser({ fullName, phone, username, password, role });
+                if (!result.success) {
+                    setError(result.message);
+                }
+            } catch (err) {
+                setError('Erro ao criar usuário.');
             }
         }
     }
+    setIsSubmitting(false);
   };
 
   const availableRoles = () => {
@@ -173,9 +183,10 @@ const AddUserPage: React.FC<AddUserPageProps> = ({ onAddUser, onUpdateUser, onCa
             <div className="flex flex-col space-y-2 pt-2">
                 <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-lg text-sm font-medium btn-primary"
+                disabled={isSubmitting}
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-lg text-sm font-medium btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                {isEditMode ? 'Salvar Alterações' : 'Salvar Usuário'}
+                {isSubmitting ? 'Salvando...' : (isEditMode ? 'Salvar Alterações' : 'Salvar Usuário')}
                 </button>
                  <button type="button" onClick={onCancel} className="w-full flex justify-center py-2 px-4 border border-slate-600 rounded-md shadow-sm text-sm font-medium text-body bg-slate-700/50 hover:bg-slate-700">
                     Cancelar

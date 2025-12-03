@@ -64,144 +64,26 @@ const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
     );
 };
 
-// Dados Iniciais (Padronizados para quando não houver LocalStorage)
-const INITIAL_PROPERTIES: Property[] = [
-    {
-      id: '1',
-      userId: 'admin-user-01',
-      name: 'Apartamento Aconchegante no Centro',
-      realtorName: 'Carlos Silva',
-      address: 'Rua das Flores, 123',
-      city: 'São Paulo',
-      state: 'SP',
-      neighborhood: 'Centro',
-      zipCode: '01001-000',
-      price: 1250000,
-      condoFee: 800,
-      iptu: 2500,
-      photoUrls: ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1920&auto=format&fit=crop', 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=1920&auto=format&fit=crop'],
-      featured: true,
-      description: 'Este apartamento de 2 quartos oferece uma vida urbana vibrante, combinando conforto e conveniência. Localizado no coração da cidade, está a poucos passos de restaurantes, lojas e transportes públicos. O interior é bem iluminado, com acabamentos modernos e uma varanda com vista para a cidade. Ideal para quem busca um estilo de vida dinâmico.',
-      type: 'venda',
-      propertyType: 'Apartamento',
-      bedrooms: 2,
-      bathrooms: 2,
-      garageSpots: 1,
-      privateArea: 75,
-      totalArea: 90,
-      yearBuilt: 2015,
-      status: 'Usado',
-      hasPool: true,
-      hasBarbecueGrill: true,
-      hasFireplace: false,
-      hasBalcony: true,
-      hasYard: false,
-      isFurnished: false,
-      mapEmbedCode: '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.4323992257!2d-46.63654068502253!3d-23.5512799846875!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce5849d3a55555%3A0x70863155826f21b7!2sR.%20das%20Flores%2C%20123%20-%20Centro%2C%20S%C3%A3o%20Paulo%20-%20SP%2C%2001001-000!5e0!3m2!1spt-BR!2sbr!4v1678887123456!5m2!1spt-BR!2sbr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>',
-      videoEmbedCode: '',
-      showVideo: false,
-    },
-    {
-      id: '2',
-      userId: 'collab-user-01',
-      name: 'Casa Moderna com Piscina',
-      realtorName: 'Fernanda Lima',
-      address: 'Avenida do Sol, 456',
-      city: 'Rio de Janeiro',
-      state: 'RJ',
-      neighborhood: 'Barra da Tijuca',
-      zipCode: '22620-172',
-      price: 3500000,
-      condoFee: 1500,
-      iptu: 8000,
-      photoUrls: ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1920&auto=format&fit=crop', 'https://images.unsplash.com/photo-1600585153316-6a524c7f395d?q=80&w=1920&auto=format&fit=crop'],
-      photo360Url: 'https://kuula.co/share/collection/7F9sT?logo=1&info=1&fs=1&vr=0&sd=1&thumbs=1',
-      featured: true,
-      description: 'Uma casa espetacular com 4 suítes, design de conceito aberto e uma área de lazer completa com piscina e churrasqueira gourmet. O acabamento de alto padrão e a localização privilegiada fazem deste imóvel uma oportunidade única. Perfeita para famílias que valorizam conforto, segurança e estilo de vida.',
-      type: 'venda',
-      propertyType: 'Casa',
-      bedrooms: 4,
-      bathrooms: 5,
-      garageSpots: 4,
-      privateArea: 320,
-      totalArea: 500,
-      yearBuilt: 2018,
-      status: 'Usado',
-      hasPool: true,
-      hasBarbecueGrill: true,
-      hasFireplace: true,
-      hasBalcony: false,
-      hasYard: true,
-      isFurnished: true,
-      videoEmbedCode: '<iframe width="560" height="315" src="https://www.youtube.com/embed/ScMzIvxBSi4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>',
-      showVideo: true,
-    },
-     {
-      id: '3',
-      userId: 'admin-user-02',
-      name: 'Cobertura Duplex com Vista Panorâmica',
-      realtorName: 'Carlos Silva',
-      address: 'Praça da Liberdade, 789',
-      city: 'Belo Horizonte',
-      state: 'MG',
-      neighborhood: 'Savassi',
-      zipCode: '30140-010',
-      price: 5800000,
-      condoFee: 2200,
-      iptu: 12000,
-      photoUrls: ['https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=1920&auto=format&fit=crop', 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?q=80&w=1920&auto=format&fit=crop'],
-      featured: false,
-      description: 'Cobertura de luxo com vista 360 graus da cidade. Terraço privativo com jacuzzi, 3 suítes e acabamento de altíssimo padrão. Localização nobre na Savassi, próximo aos melhores restaurantes e lojas.',
-      type: 'venda',
-      propertyType: 'Cobertura',
-      bedrooms: 3,
-      bathrooms: 4,
-      garageSpots: 3,
-      privateArea: 280,
-      totalArea: 400,
-      yearBuilt: 2020,
-      status: 'Novo',
-      hasPool: false,
-      hasBarbecueGrill: true,
-      hasFireplace: true,
-      hasBalcony: true,
-      hasYard: false,
-      isFurnished: false,
-      videoEmbedCode: '',
-      showVideo: false,
-    },
-];
-
-const INITIAL_USERS: User[] = [
-    { id: 'admin-user-01', fullName: 'Admin Geral', phone: '(00) 00000-0000', username: 'admin', password: 'admin123', role: 'Super Admin' },
-    { id: 'user-sample-admin', fullName: 'Outro Admin', phone: '(11) 99999-9999', username: 'admin2', password: '123', role: 'Admin' },
-    { id: 'user-sample-collab', fullName: 'Colaborador Um', phone: '(21) 98888-8888', username: 'colab', password: '123', role: 'Colaborador' },
-];
-
+// Configuração Padrão Segura (Fallback)
 const INITIAL_SETTINGS: SiteSettings = {
-      logoUrl: 'https://img.logoipsum.com/296.svg',
+      logoUrl: '',
       logoText: 'DIGIFOX',
       showLogoText: true,
-      heroBanners: [
-        { imageUrl: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=1920&auto=format&fit=crop', title: 'Encontre o Imóvel dos Seus Sonhos', subtitle: 'As melhores oportunidades estão aqui.', titleColor: '#FFFFFF', subtitleColor: '#E2E8F0', fontFamily: "'Poppins', sans-serif" },
-        { imageUrl: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?q=80&w=1920&auto=format&fit=crop', title: 'Consultoria Especializada', subtitle: 'Nossa equipe está pronta para te ajudar.', titleColor: '#FFFFFF', subtitleColor: '#E2E8F0', fontFamily: "'Montserrat', sans-serif" },
-        { imageUrl: 'https://images.unsplash.com/photo-1558036117-15d82a90b9b1?q=80&w=1920&auto=format&fit=crop', title: 'Venda ou Alugue Conosco', subtitle: 'Anuncie seu imóvel com a melhor assessoria.', titleColor: '#FFFFFF', subtitleColor: '#E2E8F0', fontFamily: "'Roboto', sans-serif" },
-      ],
-      footerContactEmail: 'contato@digifox.com.br',
-      footerContactPhone: '(11) 98765-4321',
-      footerFacebookUrl: 'https://facebook.com',
-      footerInstagramUrl: 'https://instagram.com',
-      footerLinkedInUrl: 'https://linkedin.com',
-      footerDescription: 'Encontrando o seu lugar no mundo.',
-      footerCopyright: 'DIGIFOX. Todos os direitos reservados.',
-      aboutPageImageUrl: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=1920&auto=format&fit=crop',
-      aboutPageHistory: 'Fundada em 2023, a DIGIFOX nasceu do sonho de modernizar o mercado imobiliário, combinando tecnologia de ponta com um atendimento humano e personalizado. Nossa jornada é marcada pela busca incessante por inovação e pela satisfação de cada cliente.',
-      aboutPageMission: 'Nossa missão é conectar pessoas aos seus lares e investimentos ideais, oferecendo uma experiência de compra, venda e locação transparente, eficiente e segura. Acreditamos que a tecnologia é a ferramenta para simplificar processos e potencializar decisões.',
-      aboutPageValues: 'Inovação: Buscamos constantemente novas tecnologias.\nTransparência: Clareza em cada etapa do processo.\nExcelência: Compromisso com a mais alta qualidade.\nCliente no Centro: Suas necessidades guiam nossas ações.\nÉtica: Integridade e respeito em todas as relações.',
-      contactFormRecipientEmail: 'contato@suaempresa.com',
-      companyAddress: 'Rua Inovação, 123, Bairro Tech, São Paulo - SP',
-      mapEmbedCode: '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.106692823097!2d-46.6565712850222!3d-23.56407628468153!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce59c8da0aa315%3A0x2021565136629989!2sAvenida%20Paulista%20-%20Bela%20Vista%2C%20S%C3%A3o%20Paulo%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1678887123456!5m2!1spt-BR!2sbr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>',
-      // Estilos fixos (Tema Escuro) - Não editáveis, mas parte do objeto para compatibilidade
+      heroBanners: [],
+      footerContactEmail: '',
+      footerContactPhone: '',
+      footerFacebookUrl: '',
+      footerInstagramUrl: '',
+      footerLinkedInUrl: '',
+      footerDescription: '',
+      footerCopyright: '',
+      aboutPageImageUrl: '',
+      aboutPageHistory: '',
+      aboutPageMission: '',
+      aboutPageValues: '',
+      contactFormRecipientEmail: '',
+      companyAddress: '',
+      mapEmbedCode: '',
       backgroundColor: '#0f172a',
       backgroundImageUrl: '',
       pageTitleColor: '#ffffff',
@@ -215,26 +97,14 @@ const INITIAL_SETTINGS: SiteSettings = {
       footerBackgroundColor: '#020617',
 };
 
+const API_URL = 'http://localhost:3001/api';
+
 const App: React.FC = () => {
-  // Inicialização de Estado com LocalStorage
-  const [properties, setProperties] = useState<Property[]>(() => {
-    const saved = localStorage.getItem('properties');
-    return saved ? JSON.parse(saved) : INITIAL_PROPERTIES;
-  });
-
-  const [users, setUsers] = useState<User[]>(() => {
-    const saved = localStorage.getItem('users');
-    return saved ? JSON.parse(saved) : INITIAL_USERS;
-  });
-
-  const [siteSettings, setSiteSettings] = useState<SiteSettings>(() => {
-    const saved = localStorage.getItem('siteSettings');
-    if (saved) {
-        // Merge para garantir que novas propriedades adicionadas ao tipo SiteSettings existam
-        return { ...INITIAL_SETTINGS, ...JSON.parse(saved) };
-    }
-    return INITIAL_SETTINGS;
-  });
+  // Inicialização de Estado Vazia (dados virão da API)
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(INITIAL_SETTINGS);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [page, setPage] = useState<Page>('home');
@@ -255,20 +125,32 @@ const App: React.FC = () => {
   };
   const [filters, setFilters] = useState<Filters>(initialFilters);
   
-  // Persistência de Dados (Efeitos)
+  // Carregar Dados do Servidor
   useEffect(() => {
-    localStorage.setItem('properties', JSON.stringify(properties));
-  }, [properties]);
+    const fetchData = async () => {
+      try {
+        const res = await fetch(`${API_URL}/data`);
+        if (!res.ok) throw new Error('Falha ao conectar com o servidor');
+        const data = await res.json();
+        
+        setProperties(data.properties || []);
+        setUsers(data.users || []);
+        if (data.settings && Object.keys(data.settings).length > 0) {
+            setSiteSettings({ ...INITIAL_SETTINGS, ...data.settings });
+        }
+      } catch (error) {
+        console.error("Erro ao carregar dados:", error);
+        showToast('Erro ao conectar com o servidor. Verifique se o backend está rodando.', 'error');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
-  useEffect(() => {
-    localStorage.setItem('users', JSON.stringify(users));
-  }, [users]);
+  // Persistência de Dados (Efeitos removidos - agora usamos handlers assíncronos)
 
-  useEffect(() => {
-    localStorage.setItem('siteSettings', JSON.stringify(siteSettings));
-  }, [siteSettings]);
-
-  // Aplicação da Imagem de Fundo (se houver)
+  // Aplicação da Imagem de Fundo
   useEffect(() => {
     document.body.style.backgroundImage = siteSettings.backgroundImageUrl ? `url(${siteSettings.backgroundImageUrl})` : 'none';
   }, [siteSettings.backgroundImageUrl]);
@@ -290,35 +172,59 @@ const App: React.FC = () => {
   };
   const handleLogout = () => { setCurrentUser(null); setPage('home'); };
   
-  const handleAddUser = (newUser: Omit<User, 'id'>): { success: boolean, message: string } => {
+  const handleAddUser = async (newUser: Omit<User, 'id'>): Promise<{ success: boolean, message: string }> => {
     if (users.some(u => u.username === newUser.username)) {
       showToast('Este nome de usuário já está em uso.', 'error');
       return { success: false, message: 'Este nome de usuário já está em uso.' };
     }
+    
     const user = { ...newUser, id: `user-${Date.now()}` };
-    setUsers([...users, user]);
-    showToast(`${user.role} adicionado com sucesso!`);
-    setPage('admins');
-    return { success: true, message: '' };
+    
+    try {
+        const res = await fetch(`${API_URL}/users`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(user)
+        });
+        if (!res.ok) throw new Error('Erro ao salvar no servidor');
+        
+        setUsers([...users, user]);
+        showToast(`${user.role} adicionado com sucesso!`);
+        setPage('admins');
+        return { success: true, message: '' };
+    } catch (e) {
+        showToast('Erro ao salvar usuário no servidor.', 'error');
+        return { success: false, message: 'Erro de servidor.' };
+    }
   };
 
-  const handleUpdateUser = (updatedUser: User) => {
+  const handleUpdateUser = async (updatedUser: User) => {
      const originalUser = users.find(u => u.id === updatedUser.id);
     if (!currentUser || !originalUser) return;
     
-    // Ninguém edita Super Admin (exceto ele mesmo)
     if (originalUser.role === 'Super Admin' && currentUser.id !== originalUser.id) {
        showToast('Você não tem permissão para editar o Administrador Principal.', 'error');
        return;
     }
     
-    setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
-    showToast('Usuário atualizado com sucesso!');
-    setPage('admins');
-    setEditingUserId(null);
+    try {
+        const res = await fetch(`${API_URL}/users/${updatedUser.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedUser)
+        });
+        if(!res.ok) throw new Error();
+
+        setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+        showToast('Usuário atualizado com sucesso!');
+        setPage('admins');
+        setEditingUserId(null);
+    } catch(e) {
+        showToast('Erro ao atualizar usuário.', 'error');
+    }
   };
 
-  const handleDeleteUser = (userId: string) => {
+  const handleDeleteUser = async (userId: string) => {
     const userToDelete = users.find(u => u.id === userId);
     
     if (!userToDelete || !currentUser) return;
@@ -346,55 +252,108 @@ const App: React.FC = () => {
 
     if (permissionGranted) {
         if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
-            setUsers(prev => prev.filter(user => user.id !== userId));
-            showToast('Usuário deletado com sucesso!');
-            if (currentUser.id === userId) {
-                handleLogout();
+            try {
+                const res = await fetch(`${API_URL}/users/${userId}`, { method: 'DELETE' });
+                if(!res.ok) throw new Error();
+
+                setUsers(prev => prev.filter(user => user.id !== userId));
+                showToast('Usuário deletado com sucesso!');
+                if (currentUser.id === userId) {
+                    handleLogout();
+                }
+            } catch (e) {
+                showToast('Erro ao deletar usuário.', 'error');
             }
         }
     }
   };
 
   // Handlers de Imóveis
-  const handleAddProperty = (property: Omit<Property, 'id' | 'userId'>) => {
+  const handleAddProperty = async (propertyData: Omit<Property, 'id' | 'userId'>) => {
     const newProperty: Property = {
-      ...property,
+      ...propertyData,
       id: `prop-${Date.now()}`,
       userId: currentUser?.id,
     };
-    setProperties(prev => [newProperty, ...prev]);
-    showToast(`Imóvel "${newProperty.name}" adicionado com sucesso!`);
+    
+    try {
+        const res = await fetch(`${API_URL}/properties`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newProperty)
+        });
+        if(!res.ok) throw new Error();
+
+        setProperties(prev => [newProperty, ...prev]);
+        showToast(`Imóvel "${newProperty.name}" adicionado com sucesso!`);
+    } catch(e) {
+        showToast('Erro ao adicionar imóvel.', 'error');
+    }
   };
 
-  const handleUpdateProperty = (updatedProperty: Property) => {
-    // Super Admin e Admin podem editar qualquer imóvel
+  const handleUpdateProperty = async (updatedProperty: Property) => {
     if (currentUser?.role === 'Colaborador' && updatedProperty.userId !== currentUser.id) {
         showToast('Você não tem permissão para editar este imóvel.', 'error');
         return;
     }
-    setProperties(prev => prev.map(p => p.id === updatedProperty.id ? updatedProperty : p));
-    showToast(`Imóvel "${updatedProperty.name}" atualizado com sucesso!`);
+    
+    try {
+        const res = await fetch(`${API_URL}/properties/${updatedProperty.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedProperty)
+        });
+        if(!res.ok) throw new Error();
+
+        setProperties(prev => prev.map(p => p.id === updatedProperty.id ? updatedProperty : p));
+        showToast(`Imóvel "${updatedProperty.name}" atualizado com sucesso!`);
+    } catch(e) {
+        showToast('Erro ao atualizar imóvel.', 'error');
+    }
   };
 
-  const handleDeleteProperty = (propertyId: string) => {
+  const handleDeleteProperty = async (propertyId: string) => {
     const propertyToDelete = properties.find(p => p.id === propertyId);
-    // Super Admin e Admin podem deletar qualquer imóvel
     if (currentUser?.role === 'Colaborador' && propertyToDelete?.userId !== currentUser.id) {
         showToast('Você não tem permissão para excluir este imóvel.', 'error');
         return;
     }
-    setProperties(prev => prev.filter(p => p.id !== propertyId));
-    showToast('Imóvel excluído com sucesso!');
+    
+    try {
+        const res = await fetch(`${API_URL}/properties/${propertyId}`, { method: 'DELETE' });
+        if(!res.ok) throw new Error();
+
+        setProperties(prev => prev.filter(p => p.id !== propertyId));
+        showToast('Imóvel excluído com sucesso!');
+    } catch(e) {
+        showToast('Erro ao excluir imóvel.', 'error');
+    }
   };
 
-  const handleToggleFeatured = (propertyId: string) => {
+  const handleToggleFeatured = async (propertyId: string) => {
     const propertyToToggle = properties.find(p => p.id === propertyId);
-    // Permite que colaboradores destaquem seus próprios imóveis
-    if (currentUser?.role === 'Colaborador' && propertyToToggle?.userId !== currentUser.id) {
+    if (!propertyToToggle) return;
+
+    if (currentUser?.role === 'Colaborador' && propertyToToggle.userId !== currentUser.id) {
          showToast('Você só pode destacar seus próprios imóveis.', 'error');
          return;
     }
-    setProperties(prev => prev.map(p => p.id === propertyId ? { ...p, featured: !p.featured } : p));
+    
+    const updatedProperty = { ...propertyToToggle, featured: !propertyToToggle.featured };
+    
+    try {
+        // Reusa o endpoint de update
+        const res = await fetch(`${API_URL}/properties/${propertyId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedProperty)
+        });
+        if(!res.ok) throw new Error();
+
+        setProperties(prev => prev.map(p => p.id === propertyId ? updatedProperty : p));
+    } catch(e) {
+        showToast('Erro ao alterar destaque.', 'error');
+    }
   };
   
   const handleViewProperty = (propertyId: string) => {
@@ -415,10 +374,21 @@ const App: React.FC = () => {
     setEditingUserId(userId);
     setPage('editUser');
   };
-  const handleSaveSettings = (newSettings: SiteSettings) => {
-    setSiteSettings(newSettings);
-    showToast('Configurações salvas com sucesso!');
-    setPage('admin');
+  const handleSaveSettings = async (newSettings: SiteSettings) => {
+    try {
+        const res = await fetch(`${API_URL}/settings`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newSettings)
+        });
+        if(!res.ok) throw new Error();
+
+        setSiteSettings(newSettings);
+        showToast('Configurações salvas com sucesso!');
+        setPage('admin');
+    } catch(e) {
+        showToast('Erro ao salvar configurações.', 'error');
+    }
   };
 
   const selectedProperty = useMemo(() => {
@@ -442,6 +412,10 @@ const App: React.FC = () => {
   const featuredProperties = useMemo(() => properties.filter(p => p.featured), [properties]);
 
   const renderPage = () => {
+    if (isLoading) {
+        return <div className="min-h-screen flex items-center justify-center text-white">Carregando dados...</div>;
+    }
+
     switch (page) {
       case 'home':
         return (
