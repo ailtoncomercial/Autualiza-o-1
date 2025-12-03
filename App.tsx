@@ -1,3 +1,4 @@
+
 // ... (imports remain the same)
 import React, { useState, useMemo, useEffect } from 'react';
 import { Property, User, Filters, SiteSettings, Page } from './types';
@@ -63,9 +64,8 @@ const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
     );
 };
 
-const App: React.FC = () => {
-  // ... (properties state remains the same)
-  const [properties, setProperties] = useState<Property[]>([
+// Dados Iniciais (Padronizados para quando não houver LocalStorage)
+const INITIAL_PROPERTIES: Property[] = [
     {
       id: '1',
       userId: 'admin-user-01',
@@ -170,36 +170,15 @@ const App: React.FC = () => {
       videoEmbedCode: '',
       showVideo: false,
     },
-  ]);
+];
 
-  const [users, setUsers] = useState<User[]>([
+const INITIAL_USERS: User[] = [
     { id: 'admin-user-01', fullName: 'Admin Geral', phone: '(00) 00000-0000', username: 'admin', password: 'admin123', role: 'Super Admin' },
     { id: 'user-sample-admin', fullName: 'Outro Admin', phone: '(11) 99999-9999', username: 'admin2', password: '123', role: 'Admin' },
     { id: 'user-sample-collab', fullName: 'Colaborador Um', phone: '(21) 98888-8888', username: 'colab', password: '123', role: 'Colaborador' },
-  ]);
+];
 
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  // ... (rest of states remain the same)
-  const [page, setPage] = useState<Page>('home');
-  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
-  const [editingUserId, setEditingUserId] = useState<string | null>(null);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-
-  const initialFilters: Filters = {
-    type: 'todos',
-    propertyType: '',
-    city: '',
-    state: '',
-    neighborhood: '',
-    bedrooms: 0,
-    bathrooms: 0,
-    priceMin: 0,
-    priceMax: 10000000
-  };
-  const [filters, setFilters] = useState<Filters>(initialFilters);
-  
-  const [siteSettings, setSiteSettings] = useState<SiteSettings>({
-      // ... (same settings)
+const INITIAL_SETTINGS: SiteSettings = {
       logoUrl: 'https://img.logoipsum.com/296.svg',
       logoText: 'DIGIFOX',
       showLogoText: true,
@@ -222,7 +201,7 @@ const App: React.FC = () => {
       contactFormRecipientEmail: 'contato@suaempresa.com',
       companyAddress: 'Rua Inovação, 123, Bairro Tech, São Paulo - SP',
       mapEmbedCode: '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.106692823097!2d-46.6565712850222!3d-23.56407628468153!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce59c8da0aa315%3A0x2021565136629989!2sAvenida%20Paulista%20-%20Bela%20Vista%2C%20S%C3%A3o%20Paulo%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1678887123456!5m2!1spt-BR!2sbr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>',
-      // ... (fixed colors)
+      // Estilos fixos (Tema Escuro) - Não editáveis, mas parte do objeto para compatibilidade
       backgroundColor: '#0f172a',
       backgroundImageUrl: '',
       pageTitleColor: '#ffffff',
@@ -234,13 +213,65 @@ const App: React.FC = () => {
       headerMenuHighlightColor: '#22d3ee',
       buttonColor: '#22d3ee',
       footerBackgroundColor: '#020617',
-    });
-    
-  // ... (useEffect for colors remains the same)
+};
+
+const App: React.FC = () => {
+  // Inicialização de Estado com LocalStorage
+  const [properties, setProperties] = useState<Property[]>(() => {
+    const saved = localStorage.getItem('properties');
+    return saved ? JSON.parse(saved) : INITIAL_PROPERTIES;
+  });
+
+  const [users, setUsers] = useState<User[]>(() => {
+    const saved = localStorage.getItem('users');
+    return saved ? JSON.parse(saved) : INITIAL_USERS;
+  });
+
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(() => {
+    const saved = localStorage.getItem('siteSettings');
+    if (saved) {
+        // Merge para garantir que novas propriedades adicionadas ao tipo SiteSettings existam
+        return { ...INITIAL_SETTINGS, ...JSON.parse(saved) };
+    }
+    return INITIAL_SETTINGS;
+  });
+
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [page, setPage] = useState<Page>('home');
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const initialFilters: Filters = {
+    type: 'todos',
+    propertyType: '',
+    city: '',
+    state: '',
+    neighborhood: '',
+    bedrooms: 0,
+    bathrooms: 0,
+    priceMin: 0,
+    priceMax: 10000000
+  };
+  const [filters, setFilters] = useState<Filters>(initialFilters);
+  
+  // Persistência de Dados (Efeitos)
   useEffect(() => {
-    const root = document.documentElement;
-    document.body.style.backgroundImage = siteSettings.backgroundImageUrl ? `url(${siteSettings.backgroundImageUrl})` : 'none';
+    localStorage.setItem('properties', JSON.stringify(properties));
+  }, [properties]);
+
+  useEffect(() => {
+    localStorage.setItem('users', JSON.stringify(users));
+  }, [users]);
+
+  useEffect(() => {
+    localStorage.setItem('siteSettings', JSON.stringify(siteSettings));
   }, [siteSettings]);
+
+  // Aplicação da Imagem de Fundo (se houver)
+  useEffect(() => {
+    document.body.style.backgroundImage = siteSettings.backgroundImageUrl ? `url(${siteSettings.backgroundImageUrl})` : 'none';
+  }, [siteSettings.backgroundImageUrl]);
 
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -292,7 +323,6 @@ const App: React.FC = () => {
     
     if (!userToDelete || !currentUser) return;
 
-    // Regra Global: Ninguém deleta o Super Admin
     if (userToDelete.role === 'Super Admin') {
         showToast('Não é possível excluir um Administrador Principal.', 'error');
         return;
@@ -301,10 +331,8 @@ const App: React.FC = () => {
     let permissionGranted = false;
 
     if (currentUser.role === 'Super Admin') {
-        // Super Admin deleta todos (menos Super Admin, verificado acima)
         permissionGranted = true;
     } else if (currentUser.role === 'Admin') {
-        // Admin deleta APENAS Colaboradores
         if (userToDelete.role === 'Colaborador') {
             permissionGranted = true;
         } else {
@@ -360,8 +388,8 @@ const App: React.FC = () => {
   };
 
   const handleToggleFeatured = (propertyId: string) => {
-    // Todos podem destacar seus proprios imóveis. Admin/Super Admin destacam qualquer um.
     const propertyToToggle = properties.find(p => p.id === propertyId);
+    // Permite que colaboradores destaquem seus próprios imóveis
     if (currentUser?.role === 'Colaborador' && propertyToToggle?.userId !== currentUser.id) {
          showToast('Você só pode destacar seus próprios imóveis.', 'error');
          return;
@@ -369,7 +397,6 @@ const App: React.FC = () => {
     setProperties(prev => prev.map(p => p.id === propertyId ? { ...p, featured: !p.featured } : p));
   };
   
-  // ... (navigation and other handlers remain the same)
   const handleViewProperty = (propertyId: string) => {
     setSelectedPropertyId(propertyId);
     setPage('detail');
